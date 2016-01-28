@@ -56,9 +56,6 @@ class JetInfoBranches {
     float Jet_SoftEl[nMaxJets_];
     float Jet_DoubleSV[nMaxJets_];
     float Jet_cMVA[nMaxJets_];
-    float Jet_cMVAv2[nMaxJets_];
-    float Jet_cMVAv2N[nMaxJets_];
-    float Jet_cMVAv2P[nMaxJets_];
     int   Jet_hist1[nMaxJets_];
     int   Jet_hist2[nMaxJets_];
     int   Jet_hist3[nMaxJets_];
@@ -331,6 +328,8 @@ class JetInfoBranches {
     float TagVarCSV_vertexNTracks[nMaxJets_];                        // number of tracks at secondary vertex
     float TagVarCSV_vertexEnergyRatio[nMaxJets_];                    // ratio of energy at secondary vertex over total energy
     float TagVarCSV_vertexJetDeltaR[nMaxJets_];                      // pseudoangular distance between jet axis and secondary vertex direction
+    float TagVarCSV_flightDistance1dVal[nMaxJets_];                  // transverse distance between primary and secondary vertex
+    float TagVarCSV_flightDistance1dSig[nMaxJets_];                  // transverse distance significance between primary and secondary vertex
     float TagVarCSV_flightDistance2dVal[nMaxJets_];                  // transverse distance between primary and secondary vertex
     float TagVarCSV_flightDistance2dSig[nMaxJets_];                  // transverse distance significance between primary and secondary vertex
     float TagVarCSV_flightDistance3dVal[nMaxJets_];                  // distance between primary and secondary vertex
@@ -360,7 +359,7 @@ class JetInfoBranches {
     void RegisterTree(TTree *tree, std::string name="") {
       if(name!="") name += ".";
       tree->Branch((name+"nJet").c_str(),            &nJet           ,(name+"nJet/I").c_str());
-      tree->Branch((name+"Jet_pt").c_str(),          Jet_pt        ,(name+"Jet_pt["+name+"nJet]/F").c_str());
+      tree->Branch((name+"Jet_pt").c_str(),          Jet_pt          ,(name+"Jet_pt["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_genpt").c_str(),       Jet_genpt       ,(name+"Jet_genpt["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_residual").c_str(),    Jet_residual    ,(name+"Jet_residual["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_area").c_str(),        Jet_area        ,(name+"Jet_area["+name+"nJet]/F").c_str());
@@ -405,9 +404,6 @@ class JetInfoBranches {
 
       tree->Branch((name+"Jet_DoubleSV").c_str(),    Jet_DoubleSV    ,(name+"Jet_DoubleSV["+name+"nJet]/F").c_str());
       tree->Branch((name+"Jet_cMVA").c_str(),    Jet_cMVA    ,(name+"Jet_cMVA["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_cMVAv2").c_str(),    Jet_cMVAv2    ,(name+"Jet_cMVAv2["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_cMVAv2N").c_str(),    Jet_cMVAv2N    ,(name+"Jet_cMVAv2N["+name+"nJet]/F").c_str());
-      tree->Branch((name+"Jet_cMVAv2P").c_str(),    Jet_cMVAv2P    ,(name+"Jet_cMVAv2P["+name+"nJet]/F").c_str());
 
       tree->Branch((name+"Jet_hist1").c_str(),       Jet_hist1       ,(name+"Jet_hist1["+name+"nJet]/I").c_str());
       tree->Branch((name+"Jet_hist2").c_str(),       Jet_hist2       ,(name+"Jet_hist2["+name+"nJet]/I").c_str());
@@ -656,6 +652,8 @@ class JetInfoBranches {
       tree->Branch((name+"TagVarCSV_vertexNTracks").c_str()            ,TagVarCSV_vertexNTracks            ,(name+"TagVarCSV_vertexNTracks["+name+"nJet]/F").c_str()           );
       tree->Branch((name+"TagVarCSV_vertexEnergyRatio").c_str()        ,TagVarCSV_vertexEnergyRatio        ,(name+"TagVarCSV_vertexEnergyRatio["+name+"nJet]/F").c_str()       );
       tree->Branch((name+"TagVarCSV_vertexJetDeltaR").c_str()          ,TagVarCSV_vertexJetDeltaR          ,(name+"TagVarCSV_vertexJetDeltaR["+name+"nJet]/F").c_str()         );
+      tree->Branch((name+"TagVarCSV_flightDistance1dVal").c_str()      ,TagVarCSV_flightDistance1dVal      ,(name+"TagVarCSV_flightDistance1dVal["+name+"nJet]/F").c_str()     );
+      tree->Branch((name+"TagVarCSV_flightDistance1dSig").c_str()      ,TagVarCSV_flightDistance1dSig      ,(name+"TagVarCSV_flightDistance1dSig["+name+"nJet]/F").c_str()     );
       tree->Branch((name+"TagVarCSV_flightDistance2dVal").c_str()      ,TagVarCSV_flightDistance2dVal      ,(name+"TagVarCSV_flightDistance2dVal["+name+"nJet]/F").c_str()     );
       tree->Branch((name+"TagVarCSV_flightDistance2dSig").c_str()      ,TagVarCSV_flightDistance2dSig      ,(name+"TagVarCSV_flightDistance2dSig["+name+"nJet]/F").c_str()     );
       tree->Branch((name+"TagVarCSV_flightDistance3dVal").c_str()      ,TagVarCSV_flightDistance3dVal      ,(name+"TagVarCSV_flightDistance3dVal["+name+"nJet]/F").c_str()     );
@@ -809,9 +807,6 @@ class JetInfoBranches {
 
       tree->SetBranchAddress((name+"Jet_DoubleSV").c_str(),    Jet_DoubleSV    );
       tree->SetBranchAddress((name+"Jet_cMVA").c_str(),    Jet_cMVA   );
-      tree->SetBranchAddress((name+"Jet_cMVAv2").c_str(),    Jet_cMVAv2   );
-      tree->SetBranchAddress((name+"Jet_cMVAv2N").c_str(),    Jet_cMVAv2N   );
-      tree->SetBranchAddress((name+"Jet_cMVAv2P").c_str(),    Jet_cMVAv2P   );
 
       tree->SetBranchAddress((name+"Jet_hist1").c_str(),       Jet_hist1       );
       tree->SetBranchAddress((name+"Jet_hist2").c_str(),       Jet_hist2       );
@@ -1060,6 +1055,8 @@ class JetInfoBranches {
       tree->SetBranchAddress((name+"TagVarCSV_vertexNTracks").c_str()            ,TagVarCSV_vertexNTracks           );
       tree->SetBranchAddress((name+"TagVarCSV_vertexEnergyRatio").c_str()        ,TagVarCSV_vertexEnergyRatio       );
       tree->SetBranchAddress((name+"TagVarCSV_vertexJetDeltaR").c_str()          ,TagVarCSV_vertexJetDeltaR         );
+      tree->SetBranchAddress((name+"TagVarCSV_flightDistancedVal").c_str()      ,TagVarCSV_flightDistance1dVal     );
+      tree->SetBranchAddress((name+"TagVarCSV_flightDistance1dSig").c_str()      ,TagVarCSV_flightDistance1dSig     );
       tree->SetBranchAddress((name+"TagVarCSV_flightDistance2dVal").c_str()      ,TagVarCSV_flightDistance2dVal     );
       tree->SetBranchAddress((name+"TagVarCSV_flightDistance2dSig").c_str()      ,TagVarCSV_flightDistance2dSig     );
       tree->SetBranchAddress((name+"TagVarCSV_flightDistance3dVal").c_str()      ,TagVarCSV_flightDistance3dVal     );
